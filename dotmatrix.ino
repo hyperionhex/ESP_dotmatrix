@@ -14,7 +14,7 @@
  * Arduino IDE : Tools > USB CDC On Boot = Enabled (for Serial Monitor)
  * Libraries   : MD_Parola, MD_MAX72XX, ArduinoJson (v7)
  *
- * First boot : join WiFi "DotMatrix-XXXX" and open http://192.168.4.1
+ * First boot : join WiFi "Speak_friend_and_enter" (password "mellonmellon") and open http://192.168.4.1
  * After setup: open http://dotmatrix.local or the IP scrolled on the display
  *
  * HTTP API (for Home Assistant, scripts, etc.):
@@ -43,6 +43,8 @@
 #include "web_ui.h"
 
 #define FW_VERSION    "1.0.0"
+#define AP_NAME       "dot_matrix"
+#define AP_PASS       "12345678"   // WPA2 needs at least 8 characters
 #define CS_PIN        7
 #define MAX_MODULES   16
 #define MAX_MESSAGES  20
@@ -894,10 +896,8 @@ void startWiFi() {
   apMode = true;
   WiFi.disconnect(true);
   WiFi.mode(WIFI_AP_STA);   // STA side enabled so the setup page can scan
-  String mac = WiFi.macAddress();
-  mac.replace(":", "");
-  apName = "DotMatrix-" + mac.substring(8);
-  WiFi.softAP(apName.c_str());
+  apName = AP_NAME;
+  WiFi.softAP(apName.c_str(), AP_PASS);
   WiFi.setTxPower(WIFI_POWER_8_5dBm);
   dnsServer.start(53, "*", WiFi.softAPIP());
   setenv("TZ", cfg.tz.c_str(), 1);
